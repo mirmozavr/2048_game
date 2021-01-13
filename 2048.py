@@ -62,7 +62,7 @@ class Tile:
         fs = len(str(self.value))  # font size defined by length of self.value
         arial = pg.font.SysFont('arial', size=font_size[fs], bold=True)
         fc = color['BTEXT'] if self.value and self.value < 5 else color['WTEXT']  # font color
-        text = arial.render('' if self.value is None else str(self.value), False, fc)
+        text = arial.render('' if self.value is None else str(self.value), True, fc)
         text_position = text.get_rect(centerx=corner_x + PLATE_SIZE // 2, centery=corner_y + PLATE_SIZE // 2)
         screen.blit(text, text_position)
 
@@ -105,7 +105,7 @@ def draw_all_tiles():
 
 def draw_score():
 
-    text = arial_italic.render(f'Score: {total_score}', False, color['WTEXT'])
+    text = arial_italic.render(f'Score: {total_score}', True, color['WTEXT'])
     text_position = text.get_rect(x=20, y=SIDE - 5)
     screen.blit(text, text_position)
 

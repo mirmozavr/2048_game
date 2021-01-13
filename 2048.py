@@ -5,7 +5,7 @@ import time
 
 color = {'FRAME': (128, 128, 128),
          'BTEXT': (80, 80, 80),
-         'WTEXT': (235, 235, 235),
+         'WTEXT': (255, 255, 255),
          'GREEN': (50, 255, 150),
          'BLUE': (30, 45, 255),
          'LightSalmon': (255, 160, 122),
@@ -17,32 +17,34 @@ color = {'FRAME': (128, 128, 128),
          32: (255, 99, 71),
          64: (255, 69, 0),
          128: (255, 165, 0),
-         256: (255, 215, 0),
-         512: (255, 255, 0),
+         256: (230, 190, 75),
+         512: (204, 204, 0),
          1024: (189, 183, 107),
          2048: (102, 205, 170),
          4096: (0, 128, 128),
          8192: (0, 206, 209),
+         16384: (0, 206, 209),
          }
 font_size = {
     1: 56,
     2: 56,
-    3: 50,
-    4: 48,
-    5: 45,
+    3: 46,
+    4: 32,
+    5: 28,
 }
 pg.init()
 pg.display.set_caption('2048')
 
-PLATES = 4  # number of plates on one side
+PLATES = 6  # number of plates on one side
 PLATE_SIZE = 80
 MARGIN = 15
 GAP = 2
 SIDE = PLATES * PLATE_SIZE + MARGIN * 2 + GAP * (PLATES - 1)
-SCREEN_SIZE = (SIDE, SIDE)
+SCREEN_SIZE = (SIDE, SIDE + 30)
 
 timer = pg.time.Clock()
 screen = pg.display.set_mode(SCREEN_SIZE)
+arial_italic = pg.font.SysFont('arial', size=20, bold=True, italic=True)
 
 
 class Tile:
@@ -58,9 +60,9 @@ class Tile:
                      (corner_x, corner_y,
                       PLATE_SIZE, PLATE_SIZE), border_radius=5)
         fs = len(str(self.value))  # font size defined by length of self.value
-        courier = pg.font.SysFont('arial', size=font_size[fs], bold=True)
+        arial = pg.font.SysFont('arial', size=font_size[fs], bold=True)
         fc = color['BTEXT'] if self.value and self.value < 5 else color['WTEXT']  # font color
-        text = courier.render('' if self.value is None else str(self.value), False, fc)
+        text = arial.render('' if self.value is None else str(self.value), False, fc)
         text_position = text.get_rect(centerx=corner_x + PLATE_SIZE // 2, centery=corner_y + PLATE_SIZE // 2)
         screen.blit(text, text_position)
 
@@ -101,6 +103,14 @@ def draw_all_tiles():
             field[i][j].draw()
 
 
+def draw_score():
+
+    text = arial_italic.render(f'Score: {total_score}', False, color['WTEXT'])
+    text_position = text.get_rect(x=20, y=SIDE - 5)
+    screen.blit(text, text_position)
+
+
+total_score = 0
 start = True
 while True:
     screen.fill(color['FRAME'])
@@ -114,6 +124,9 @@ while True:
 
     # draw all tiles
     draw_all_tiles()
+
+    # draw score
+    draw_score()
 
     for event in pg.event.get():
         if event.type == pg.QUIT:
@@ -134,6 +147,7 @@ while True:
                                 pass
                             elif field[row][col].value == field[row + 1][col].value:
                                 field[row][col].value *= 2
+                                total_score += field[row][col].value
                                 field[row + 1][col].value = None
                                 movement = True
             elif event.key == pg.K_DOWN:
@@ -148,6 +162,7 @@ while True:
                                 pass
                             elif field[row][col].value == field[row - 1][col].value:
                                 field[row][col].value *= 2
+                                total_score += field[row][col].value
                                 field[row - 1][col].value = None
                                 movement = True
 
@@ -163,6 +178,7 @@ while True:
                                 pass
                             elif field[row][col].value == field[row][col + 1].value:
                                 field[row][col].value *= 2
+                                total_score += field[row][col].value
                                 field[row][col + 1].value = None
                                 movement = True
 
@@ -178,6 +194,7 @@ while True:
                                 pass
                             elif field[row][col].value == field[row][col - 1].value:
                                 field[row][col].value *= 2
+                                total_score += field[row][col].value
                                 field[row][col - 1].value = None
                                 movement = True
             # actions if tiles moved

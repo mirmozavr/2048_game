@@ -4,7 +4,8 @@ import random
 import time
 
 color = {'FRAME': (128, 128, 128),
-         'TEXT': (40, 40, 40),
+         'BTEXT': (80, 80, 80),
+         'WTEXT': (235, 235, 235),
          'GREEN': (50, 255, 150),
          'BLUE': (30, 45, 255),
          'LightSalmon': (255, 160, 122),
@@ -45,7 +46,6 @@ screen = pg.display.set_mode(SCREEN_SIZE)
 
 
 class Tile:
-    # __slots__ = 'row', 'column', 'value', 'color'
 
     def __init__(self, row, column, value=None):
         self.row, self.column, self.value = row, column, value
@@ -57,13 +57,15 @@ class Tile:
         pg.draw.rect(screen, tile_color,
                      (corner_x, corner_y,
                       PLATE_SIZE, PLATE_SIZE), border_radius=5)
-        fs = len(str(self.value))
+        fs = len(str(self.value))  # font size defined by length of self.value
         courier = pg.font.SysFont('arial', size=font_size[fs], bold=True)
-        text = courier.render('' if self.value is None else str(self.value), False, color['TEXT'])
+        fc = color['BTEXT'] if self.value and self.value < 5 else color['WTEXT']  # font color
+        text = courier.render('' if self.value is None else str(self.value), False, fc)
         text_position = text.get_rect(centerx=corner_x + PLATE_SIZE // 2, centery=corner_y + PLATE_SIZE // 2)
         screen.blit(text, text_position)
 
     def __str__(self):
+        """Utility"""
         return f'row {self.column}, col {self.row}, val {self.value}'
 
 

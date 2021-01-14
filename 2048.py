@@ -35,7 +35,7 @@ font_size = {
 pg.init()
 pg.display.set_caption('2048')
 
-PLATES = 3  # number of plates on one side
+PLATES = 4  # number of plates on one side
 PLATE_SIZE = 80
 MARGIN = 15
 GAP = 2

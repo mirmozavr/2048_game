@@ -4,8 +4,8 @@ import random
 import time
 
 color = {'FRAME': (128, 128, 128),
-         'BTEXT': (80, 80, 80),
-         'WTEXT': (255, 255, 255),
+         'BLACK_TEXT': (80, 80, 80),
+         'WHITE_TEXT': (255, 255, 255),
          'GREEN': (50, 255, 150),
          'BLUE': (30, 45, 255),
          'LightSalmon': (255, 160, 122),
@@ -35,7 +35,7 @@ font_size = {
 pg.init()
 pg.display.set_caption('2048')
 
-PLATES = 6  # number of plates on one side
+PLATES = 3  # number of plates on one side
 PLATE_SIZE = 80
 MARGIN = 15
 GAP = 2
@@ -61,7 +61,7 @@ class Tile:
                       PLATE_SIZE, PLATE_SIZE), border_radius=5)
         fs = len(str(self.value))  # font size defined by length of self.value
         arial = pg.font.SysFont('arial', size=font_size[fs], bold=True)
-        fc = color['BTEXT'] if self.value and self.value < 5 else color['WTEXT']  # font color
+        fc = color['BLACK_TEXT'] if self.value and self.value < 5 else color['WHITE_TEXT']  # font color
         text = arial.render('' if self.value is None else str(self.value), True, fc)
         text_position = text.get_rect(centerx=corner_x + PLATE_SIZE // 2, centery=corner_y + PLATE_SIZE // 2)
         screen.blit(text, text_position)
@@ -104,10 +104,19 @@ def draw_all_tiles():
 
 
 def draw_score():
-
-    text = arial_italic.render(f'Score: {total_score}', True, color['WTEXT'])
+    text = arial_italic.render(f'Score: {total_score}', True, color['WHITE_TEXT'])
     text_position = text.get_rect(x=20, y=SIDE - 5)
     screen.blit(text, text_position)
+
+
+def game_over():
+    end_game = arial_italic.render(f'GAME OVER', True, color['WHITE_TEXT'], (70, 70, 70))
+    text_position = end_game.get_rect(centerx=SIDE // 2, centery=SIDE // 2)
+    screen.blit(end_game, text_position)
+    timer.tick(30)
+    pg.display.update()
+    time.sleep(5)
+    quit()
 
 
 total_score = 0
@@ -204,12 +213,11 @@ while True:
 
                 # check if no free space to spawn numbers
                 if check_lost():
-                    print('LOST')
                     draw_all_tiles()
                     timer.tick(30)
                     pg.display.update()
-                    time.sleep(3)
-                    quit()
+                    time.sleep(1)
+                    game_over()
 
     timer.tick(30)
     pg.display.update()

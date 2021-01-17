@@ -24,6 +24,11 @@ color = {'FRAME': (128, 128, 128),
          4096: (0, 128, 128),
          8192: (0, 206, 209),
          16384: (0, 206, 209),
+         32768: (21, 91, 83),
+         65536: (133, 111, 177),
+         131072: (20, 188, 173),
+         262144: (191, 192, 228),
+         524288: (225, 47, 70),
          }
 font_size = {
     1: 56,
@@ -35,7 +40,7 @@ font_size = {
 pg.init()
 pg.display.set_caption('2048')
 
-PLATES = 4  # number of plates on one side
+PLATES = 8  # number of plates on one side
 PLATE_SIZE = 80
 MARGIN = 15
 GAP = 2
@@ -119,6 +124,21 @@ def game_over():
     quit()
 
 
+def sum_up_tiles(tile1, tile2):
+    """Sum up values of 2 tiles and updating total_score and movement vars"""
+    global total_score, movement
+    tile1.value *= 2
+    tile2.value = None
+    total_score += tile1.value
+    movement = True
+
+
+def exchange_tiles(tile1, tile2):
+    global movement
+    tile1.value, tile2.value = tile2.value, tile1.value
+    movement = True
+
+
 total_score = 0
 start = True
 while True:
@@ -142,70 +162,52 @@ while True:
             pg.quit()
             sys.exit()
 
-        elif event.type == pg.KEYDOWN: # and event.key in (pg.K_UP, pg.K_DOWN, pg.K_LEFT, pg.K_RIGHT):  # == pg.KEYDOWN:
+        elif event.type == pg.KEYDOWN:
             movement = False
             if event.key == pg.K_UP:
                 for _ in range(PLATES):
                     for row in range(PLATES - 1):
                         for col in range(PLATES):
                             if field[row][col].value is None and field[row + 1][col].value is not None:
-                                field[row][col].value, field[row + 1][col].value = field[row + 1][col].value, \
-                                                                                   field[row][col].value
-                                movement = True
-                            elif field[row][col].value is None:
+                                exchange_tiles(field[row][col], field[row + 1][col])
+                            elif field[row][col].value is None:  # to skip both None situation
                                 pass
                             elif field[row][col].value == field[row + 1][col].value:
-                                field[row][col].value *= 2
-                                total_score += field[row][col].value
-                                field[row + 1][col].value = None
-                                movement = True
+                                sum_up_tiles(field[row][col], field[row + 1][col])
+
             elif event.key == pg.K_DOWN:
                 for _ in range(PLATES):
                     for row in range(PLATES - 1, 0, -1):
                         for col in range(PLATES):
                             if field[row][col].value is None and field[row - 1][col].value is not None:
-                                field[row][col].value, field[row - 1][col].value = field[row - 1][col].value, \
-                                                                                   field[row][col].value
-                                movement = True
+                                exchange_tiles(field[row][col], field[row - 1][col])
                             elif field[row][col].value is None:
                                 pass
                             elif field[row][col].value == field[row - 1][col].value:
-                                field[row][col].value *= 2
-                                total_score += field[row][col].value
-                                field[row - 1][col].value = None
-                                movement = True
+                                sum_up_tiles(field[row][col], field[row - 1][col])
 
             elif event.key == pg.K_LEFT:
                 for _ in range(PLATES):
                     for row in range(PLATES):
                         for col in range(PLATES - 1):
                             if field[row][col].value is None and field[row][col + 1].value is not None:
-                                field[row][col].value, field[row][col + 1].value = field[row][col + 1].value, \
-                                                                                   field[row][col].value
-                                movement = True
+                                exchange_tiles(field[row][col], field[row][col + 1])
                             elif field[row][col].value is None:
                                 pass
                             elif field[row][col].value == field[row][col + 1].value:
-                                field[row][col].value *= 2
-                                total_score += field[row][col].value
-                                field[row][col + 1].value = None
-                                movement = True
+                                sum_up_tiles(field[row][col], field[row][col + 1])
 
             elif event.key == pg.K_RIGHT:
                 for _ in range(PLATES):
                     for row in range(PLATES):
                         for col in range(PLATES - 1, 0, -1):
                             if field[row][col].value is None and field[row][col - 1].value is not None:
-                                field[row][col].value, field[row][col - 1].value = field[row][col - 1].value, \
-                                                                                   field[row][col].value
-                                movement = True
+                                exchange_tiles(field[row][col], field[row][col - 1])
                             elif field[row][col].value is None:
                                 pass
                             elif field[row][col].value == field[row][col - 1].value:
-                                field[row][col].value *= 2
-                                total_score += field[row][col].value
-                                field[row][col - 1].value = None
-                                movement = True
+                                sum_up_tiles(field[row][col], field[row][col - 1])
+
             # actions if tiles moved
             if movement:
                 x, y = choose_empty_spot()
